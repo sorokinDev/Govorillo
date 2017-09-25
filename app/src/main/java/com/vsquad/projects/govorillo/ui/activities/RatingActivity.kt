@@ -25,15 +25,17 @@ import com.google.gson.GsonBuilder
 import com.vsquad.projects.govorillo.R
 import com.vsquad.projects.govorillo.models.entities.SpeechRating
 import com.vsquad.projects.govorillo.ui.base.BaseLifecycleActivity
+import com.vsquad.projects.govorillo.viewById
 import com.vsquad.projects.govorillo.viewmodels.activities.ResultActivityViewModel
 
-class RatingActivity(override val viewModelClass: Class<ResultActivityViewModel> = ResultActivityViewModel::class.java)
+import kotlinx.android.synthetic.main.activity_rating.*
+
+class RatingActivity
     : BaseLifecycleActivity<ResultActivityViewModel>() {
 
-    private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
+    override val viewModelClass: Class<ResultActivityViewModel> = ResultActivityViewModel::class.java
 
-    private var mViewPager: ViewPager? = null
-    private lateinit var speechRating: SpeechRating
+    lateinit private var mSectionsPagerAdapter: SectionsPagerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,25 +44,18 @@ class RatingActivity(override val viewModelClass: Class<ResultActivityViewModel>
         if(viewModel.speechRating == null)
             viewModel.speechRating = Gson().fromJson(intent.getStringExtra("SpeechRating"), SpeechRating::class.java)
 
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
         setSupportActionBar(toolbar)
 
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
+        container.adapter = mSectionsPagerAdapter
 
-        mViewPager = findViewById(R.id.container) as ViewPager
-        mViewPager!!.adapter = mSectionsPagerAdapter
-
-        val tabLayout = findViewById(R.id.tabs) as TabLayout
-        tabLayout.setupWithViewPager(mViewPager)
+        tabs.setupWithViewPager(container)
     }
 
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
-
         override fun getItem(position: Int): Fragment =
                 PlaceholderFragment.newInstance(position, viewModel.speechRating!!)
-
         override fun getCount(): Int = 4
-
         override fun getPageTitle(position: Int): CharSequence? = when (position) {
             0 -> "Main"
             1 -> "Pros"
@@ -75,9 +70,10 @@ class RatingActivity(override val viewModelClass: Class<ResultActivityViewModel>
         override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                                   savedInstanceState: Bundle?): View? {
             val rootView = inflater!!.inflate(R.layout.fragment_rating_content, container, false)
-            val textView = rootView.findViewById(R.id.section_label) as TextView
+            val textView = rootView.viewById<TextView>(R.id.section_label)
             speechRating = Gson().fromJson(arguments.getString(ARG_CONTENT), SpeechRating::class.java)
             val secN = arguments.getInt(ARG_SECTION_NUMBER)
+
             textView.text = getString(R.string.section_format, arguments.getInt(ARG_SECTION_NUMBER)) +
                     "\n" + when(secN){
                 0 -> speechRating.points

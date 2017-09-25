@@ -13,11 +13,14 @@ import com.vsquad.projects.govorillo.ui.base.BaseLifecycleActivity
 import com.vsquad.projects.govorillo.ui.fragments.MainFragment
 import com.vsquad.projects.govorillo.viewmodels.activities.MainActivityViewModel
 
-class MainActivity(override val viewModelClass: Class<MainActivityViewModel> = MainActivityViewModel::class.java)
-    : BaseLifecycleActivity<MainActivityViewModel>(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity
+    : BaseLifecycleActivity<MainActivityViewModel>() {
+
+    override val viewModelClass: Class<MainActivityViewModel> = MainActivityViewModel::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
@@ -26,58 +29,34 @@ class MainActivity(override val viewModelClass: Class<MainActivityViewModel> = M
         drawer_layout.addDrawerListener(toggle)
         toggle.syncState()
 
-        nav_view.setNavigationItemSelectedListener(this)
-    }
+        nav_view.setNavigationItemSelectedListener {
+            val frId = when(it.itemId){
+                R.id.nav_main -> R.integer.fragment_main
+                else -> R.integer.fragment_main
+            }
+            navigateToFragment(frId)
 
-    override fun onBackPressed() {
-        if (drawer_layout.isDrawerOpen(GravityCompat.START)) {
             drawer_layout.closeDrawer(GravityCompat.START)
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        val id = item.itemId
-
-
-        return if (id == R.id.action_settings) {
             true
-        } else super.onOptionsItemSelected(item)
-
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        // Handle result_navigation view item clicks here.
-        val id = item.itemId
-
-        val frId = when(id){
-            R.id.nav_main -> R.integer.fragment_main
-            else -> R.integer.fragment_main
         }
 
-        navigateToFragment(frId)
+        // For default fragment
+        nav_view.menu.findItem(R.id.nav_main).isChecked = true
+        navigateToFragment(R.integer.fragment_main)
 
-        drawer_layout.closeDrawer(GravityCompat.START)
-        return true
     }
 
-    fun navigateToFragment(id: Int){
+    private fun navigateToFragment(id: Int){
         val fr = when(id){
             R.integer.fragment_main -> MainFragment.newInstance()
             else -> Fragment()
         }
 
-
         supportFragmentManager.beginTransaction().replace(R.id.fl_content, fr).commit()
+    }
+
+    override fun onBackPressed() {
+        if (drawer_layout.isDrawerOpen(GravityCompat.START))  drawer_layout.closeDrawer(GravityCompat.START)
+        else super.onBackPressed()
     }
 }
