@@ -1,22 +1,16 @@
 package com.vsquad.projects.govorillo.ui.activities
 
-import android.support.design.widget.TabLayout
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
-
+import android.annotation.SuppressLint
+import android.content.Context
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.ViewPager
 import android.os.Bundle
-import android.speech.SpeechRecognizer
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.ListView
 
 import android.widget.TextView
 import com.google.gson.Gson
@@ -29,6 +23,7 @@ import com.vsquad.projects.govorillo.viewById
 import com.vsquad.projects.govorillo.viewmodels.activities.ResultActivityViewModel
 
 import kotlinx.android.synthetic.main.activity_rating.*
+import org.w3c.dom.Text
 
 class RatingActivity
     : BaseLifecycleActivity<ResultActivityViewModel>() {
@@ -69,19 +64,32 @@ class RatingActivity
         lateinit var speechRating: SpeechRating
         override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                                   savedInstanceState: Bundle?): View? {
-            val rootView = inflater!!.inflate(R.layout.fragment_rating_content, container, false)
-            val textView = rootView.viewById<TextView>(R.id.section_label)
             speechRating = Gson().fromJson(arguments.getString(ARG_CONTENT), SpeechRating::class.java)
             val secN = arguments.getInt(ARG_SECTION_NUMBER)
 
-            textView.text = getString(R.string.section_format, arguments.getInt(ARG_SECTION_NUMBER)) +
-                    "\n" + when(secN){
-                0 -> speechRating.points
-                1 -> speechRating.pros.toString()
-                2 -> speechRating.cons.toString()
-                3 -> speechRating.advices.toString()
-                else -> "None"
+            var rootView: View = View(inflater!!.context)
+            when(secN){
+                0 -> {
+                    rootView = inflater!!.inflate(R.layout.fragment_rating_main, container, false)
+                    rootView.viewById<TextView>(R.id.tv_points).text = speechRating.points.toString() + "/100"
+                }
+                1 -> {
+                    rootView = inflater!!.inflate(R.layout.fragment_rating_pros_cons, container, false)
+                    rootView.viewById<ListView>(R.id.list_pros_cons).adapter =
+                            SimpleAdapter(inflater, speechRating.pros)
+                }
+                2 -> {
+                    rootView = inflater!!.inflate(R.layout.fragment_rating_pros_cons, container, false)
+                    rootView.viewById<ListView>(R.id.list_pros_cons).adapter =
+                            SimpleAdapter(inflater, speechRating.cons)
+                }
+                3 -> {
+                    rootView = inflater!!.inflate(R.layout.fragment_rating_pros_cons, container, false)
+                    rootView.viewById<ListView>(R.id.list_pros_cons).adapter =
+                            SimpleAdapter(inflater, speechRating.advices)
+                }
             }
+
             return rootView
         }
 
@@ -97,6 +105,27 @@ class RatingActivity
                 fragment.arguments = args
                 return fragment
             }
+        }
+    }
+
+    class SimpleAdapter(private val inflater: LayoutInflater, lst: List<String>) : BaseAdapter() {
+        private var Lst = ArrayList<String>()
+
+        init {
+            this.Lst = lst as ArrayList<String>
+        }
+
+        override fun getCount(): Int = Lst.size
+
+        override fun getItem(i: Int): Any = i
+
+        override fun getItemId(i: Int): Long = i.toLong()
+
+        @SuppressLint("InflateParams", "ViewHolder")
+        override fun getView(i: Int, convertView: View?, viewGroup: ViewGroup): View {
+            val vi = inflater.inflate(android.R.layout.simple_list_item_1, null)
+            vi.viewById<TextView>(android.R.id.text1).text = Lst[i]
+            return vi
         }
     }
 }
