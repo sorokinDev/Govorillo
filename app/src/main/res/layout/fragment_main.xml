@@ -12,6 +12,12 @@
         android:textAlignment="center"
         android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:text="Просто начните говорить"/>
+    <TextView
+        android:id="@+id/tv_timer"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"/>
     <RelativeLayout
         android:layout_width="220dp"
         android:layout_height="220dp"

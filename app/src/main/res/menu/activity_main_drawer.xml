@@ -5,16 +5,11 @@
         <item
             android:id="@+id/nav_main"
             android:icon="@drawable/ic_home_24_b"
-            android:title="Home" />
+            android:title="Главная" />
+        <item
+            android:id="@+id/nav_twister"
+            android:icon="@drawable/ic_home_24_b"
+            android:title="Скороговорки" />
     </group>
-
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_manage"
-                android:icon="@drawable/ic_menu_manage"
-                android:title="Settinggs" />
-        </menu>
-    </item>
 
 </menu>

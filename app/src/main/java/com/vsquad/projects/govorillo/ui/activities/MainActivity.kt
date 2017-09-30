@@ -11,6 +11,7 @@ import android.view.MenuItem
 import com.vsquad.projects.govorillo.R
 import com.vsquad.projects.govorillo.ui.base.BaseLifecycleActivity
 import com.vsquad.projects.govorillo.ui.fragments.MainFragment
+import com.vsquad.projects.govorillo.ui.fragments.TwisterFragment
 import com.vsquad.projects.govorillo.viewmodels.activities.MainActivityViewModel
 
 class MainActivity
@@ -32,6 +33,7 @@ class MainActivity
         nav_view.setNavigationItemSelectedListener {
             val frId = when(it.itemId){
                 R.id.nav_main -> R.integer.fragment_main
+                R.id.nav_twister -> R.integer.fragment_twister
                 else -> R.integer.fragment_main
             }
             navigateToFragment(frId)
@@ -42,6 +44,7 @@ class MainActivity
 
         // For default fragment
         nav_view.menu.findItem(R.id.nav_main).isChecked = true
+
         navigateToFragment(R.integer.fragment_main)
 
     }
@@ -49,6 +52,7 @@ class MainActivity
     private fun navigateToFragment(id: Int){
         val fr = when(id){
             R.integer.fragment_main -> MainFragment.newInstance()
+            R.integer.fragment_twister -> TwisterFragment.newInstance()
             else -> Fragment()
         }
 

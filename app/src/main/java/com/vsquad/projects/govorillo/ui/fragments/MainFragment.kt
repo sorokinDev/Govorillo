@@ -17,12 +17,20 @@ import com.vsquad.projects.govorillo.ui.activities.RatingActivity
 import com.vsquad.projects.govorillo.ui.base.BaseLifecycleFragment
 import com.vsquad.projects.govorillo.viewmodels.fragments.MainFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.util.*
+import kotlin.concurrent.thread
+import kotlin.concurrent.timer
 
 
 class MainFragment()
     : BaseLifecycleFragment<MainFragmentViewModel>() {
 
     override val viewModelClass: Class<MainFragmentViewModel> = MainFragmentViewModel::class.java
+    var lastState:RecordingState = RecordingState.STOPPED
+    var tmr: Timer? = null
+    var secs: Int = 0
+
+    val dumbLock: Any? = null;
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -30,17 +38,30 @@ class MainFragment()
         btn_speaking.setOnClickListener { viewModel.SwitchRecording() }
 
         viewModel.recordingState.observe(this, obs {
+            if(it == lastState) return@obs
+
             when(it){
                 RecordingState.STOPPED -> {
                     btn_speaking.clearAnimation()
                     btn_speaking.setImageResource(R.drawable.ic_mic_48_w)
                     pulsator.stop()
+                    //tmr!!.cancel()
                 }
                 RecordingState.RECORDING -> {
                     btn_speaking.clearAnimation()
                     btn_speaking.setImageResource(R.drawable.ic_stop_48_w)
                     pulsator.start()
-
+                    secs = 0
+                    tmr = timer("tmr", false, 0.toLong(), 1000){
+                        ++secs
+                        //TODO timer
+                        /*tv_timer.post({
+                            thread() {
+                                tv_timer.text = (secs/60).toString() + ":" + (secs % 60).toString()
+                            }
+                        })*/
+                        //tv_timer.text = (secs/60).toString() + ":" + (secs % 60).toString()
+                    }
                 }
                 RecordingState.WAITING -> {
                     btn_speaking.setImageResource(R.drawable.ic_all_inclusive_48_w)

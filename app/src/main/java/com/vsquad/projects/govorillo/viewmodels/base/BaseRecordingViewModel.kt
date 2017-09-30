@@ -20,11 +20,12 @@ import ru.yandex.speechkit.SpeechKit
  * Created by Vova on 19.09.2017.
  */
 abstract class BaseRecordingViewModel<T : ISpeechRater<SRAP>, SRAP>(application: Application) : AndroidViewModel(application), RecognizerListener {
+
     var speechResult: MutableLiveData<SpeechRating> = MutableLiveData()
     protected var isRecording: Boolean = false
     val recordingState: MutableLiveData<RecordingState> = MutableLiveData<RecordingState>()
     protected lateinit var recognizer: Recognizer
-    protected val soundData: MutableList<Byte> = mutableListOf<Byte>()
+    protected var soundData: List<Byte> = mutableListOf<Byte>()
 
     protected abstract var speechRater: ISpeechRater<SRAP>
 
@@ -46,7 +47,6 @@ abstract class BaseRecordingViewModel<T : ISpeechRater<SRAP>, SRAP>(application:
 
         if(isRecording){
             if(Recognizer.isRecognitionAvailable()){
-                soundData.clear()
                 recognizer = Recognizer.create("ru-RU", Recognizer.Model.NOTES, this, true)
                 recognizer.start()
                 isRecording = true
@@ -54,7 +54,6 @@ abstract class BaseRecordingViewModel<T : ISpeechRater<SRAP>, SRAP>(application:
                 isRecording = false
                 recordingState.value = RecordingState.STOPPED
                 Log.d("BaseRecordingVM", "Recognition not enabled")
-
             }
         }else{
             recognizer.finishRecording()
@@ -76,7 +75,7 @@ abstract class BaseRecordingViewModel<T : ISpeechRater<SRAP>, SRAP>(application:
 
     override fun onSoundDataRecorded(p0: Recognizer?, p1: ByteArray?) {
         //Log.d("RecognitionListener", "onSoundDataRecorded")
-        soundData += p1!!.asList()
+        soundData = p1!!.asList()
     }
 
     override fun onPowerUpdated(p0: Recognizer?, p1: Float) {
@@ -84,7 +83,8 @@ abstract class BaseRecordingViewModel<T : ISpeechRater<SRAP>, SRAP>(application:
     }
 
     override fun onPartialResults(p0: Recognizer?, p1: Recognition?, p2: Boolean) {
-        Log.d("RecognitionListener", "onPartialResults")
+        Log.d("PartialResults", p1!!.bestResultText)
+
     }
 
     override fun onRecordingBegin(p0: Recognizer?) {
